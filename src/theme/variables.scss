@@ -1,0 +1,32 @@
+:root {
+  /* Colors - Derived from Login Design */
+  --color-primary: #3e70e5; /* Ellipse 5 approx */
+  --color-secondary: #3c6399; /* Ellipse 6 approx */
+  --color-accent: #a6b0d9; /* Ellipse 7 approx */
+  --color-bg-dark: #1f2f4b; /* Background Base */
+  --color-bg-darker: #161829; /* Deep Background */
+  
+  --color-text-white: #ffffff;
+  --color-text-muted: #d1d5db;
+  
+  --color-input-border: #3d4a6b;
+  
+  /* Dashboard Colors */
+  --color-bg-light: #f3f4f6;
+  --color-text-dark: #1f2937;
+  
+  /* Gradients */
+  --gradient-btn: radial-gradient(circle at center, #52578d 0%, #000041 100%);
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Reset helpers */
+* {
+  box-sizing: border-box;
+}
