@@ -1,0 +1,319 @@
+<div class="min-h-screen bg-[#F8F9FE] font-sans text-slate-800">
+
+    <!-- Header -->
+    <header
+        class="flex flex-col md:flex-row justify-between items-center px-6 md:px-12 py-4 md:py-6 bg-white sticky top-0 z-50 gap-4 md:gap-0">
+        <!-- Left: Qvault -->
+        <div class="w-full md:w-1/4 flex justify-center md:justify-start cursor-pointer" routerLink="/landing">
+            <img src="assets/images/qvault-logo.jpg" alt="Qvault" class="h-8 object-contain">
+        </div>
+
+        <!-- Center: Kristu Jayanti -->
+        <div class="w-full md:w-2/4 flex justify-center cursor-pointer" routerLink="/landing">
+            <img src="assets/images/kristu-logo.png" alt="Kristu Jayanti College" class="h-10 md:h-12 object-contain">
+        </div>
+
+        <!-- Right: Profile -->
+        <div class="w-full md:w-1/4 flex justify-center md:justify-end items-center gap-4 relative">
+            <div class="text-right hidden md:block">
+                <p class="text-sm font-bold text-gray-900">{{ user.email }}</p>
+            </div>
+
+            <!-- Dynamic Avatar -->
+            <button (click)="toggleProfileMenu()"
+                class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-sm border-2 border-white shadow-md hover:ring-2 hover:ring-green-300 transition-all focus:outline-none">
+                {{ user.initials }}
+            </button>
+
+            <!-- Profile Dropdown Card -->
+            <div *ngIf="showProfileMenu"
+                class="absolute top-14 right-0 md:right-0 w-80 bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 z-[100] flex flex-col items-center animate-fade-in-down">
+                <!-- Avatar Large -->
+                <div
+                    class="w-24 h-24 rounded-full bg-green-500 text-white flex items-center justify-center text-3xl font-bold mb-4 shadow-inner">
+                    <img *ngIf="false" src="assets/avatar-3d.png" alt="Avatar"
+                        class="w-full h-full object-cover rounded-full">
+                    {{ user.initials }}
+                </div>
+
+                <!-- User Info -->
+                <h3 class="text-xl font-bold text-gray-900 mb-1">{{ user.name || 'User' }}</h3>
+                <p class="text-sm text-gray-500 mb-8">{{ user.email }}</p>
+
+                <!-- Logout Button -->
+                <button (click)="logout()"
+                    class="flex items-center gap-2 px-6 py-3 bg-gray-400 text-gray-900 font-semibold rounded-full hover:bg-gray-300 transition-colors w-full justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                    </svg>
+                    Log out
+                </button>
+            </div>
+
+            <button class="text-gray-400 hover:text-red-500 transition-colors" routerLink="/favorites">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section with Search -->
+    <section class="relative bg-[#F3E8FF] pb-24 pt-8 px-6 md:px-12 overflow-hidden">
+
+        <!-- Content Container -->
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="flex flex-col items-center justify-center text-center mb-10">
+
+                <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-6 leading-tight">
+                    Question Papers <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-[#8B5CF6] to-[#EC4899]"></span>
+                </h2>
+
+                <!-- Improved Search Bar -->
+                <div
+                    class="w-full max-w-5xl bg-white rounded-3xl shadow-[0_20px_50px_rgba(139,92,246,0.15)] p-2 flex flex-col md:flex-row items-stretch md:items-center relative z-20 border border-purple-50/50">
+
+                    <!-- Exam Session -->
+                    <div
+                        class="w-full md:flex-1 flex items-center gap-3 px-4 py-2 border-b md:border-b-0 md:border-r border-gray-100">
+                        <div
+                            class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                            </svg>
+                        </div>
+                        <div class="flex flex-col w-full">
+                            <label class="text-[10px] font-bold text-gray-900 uppercase tracking-wider">Exam
+                                Session</label>
+                            <select [(ngModel)]="selectedSession" (keyup.enter)="onSearch()"
+                                class="w-full bg-transparent text-xs text-gray-500 focus:outline-none cursor-pointer p-0 appearance-none">
+                                <option value="" disabled selected>Choose a Session</option>
+                                <option *ngFor="let term of years" [value]="term">{{ term }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Course Code -->
+                    <div
+                        class="w-full md:flex-1 flex items-center gap-3 px-4 py-2 border-b md:border-b-0 md:border-r border-gray-100">
+                        <div
+                            class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0h18M5 21h14a2 2 0 002-2v-3.25" />
+                            </svg>
+                        </div>
+                        <div class="flex flex-col w-full">
+                            <label class="text-[10px] font-bold text-gray-900 uppercase tracking-wider">Course
+                                Code</label>
+                            <input type="text" placeholder="Enter Course Code" list="courseCodesList"
+                                [(ngModel)]="selectedCode" (keyup.enter)="onSearch()"
+                                class="w-full bg-transparent text-xs text-gray-500 focus:outline-none cursor-pointer p-0 appearance-none placeholder-gray-400" />
+                            <datalist id="courseCodesList">
+                                <option *ngFor="let code of courseCodes" [value]="code"></option>
+                            </datalist>
+                        </div>
+                    </div>
+
+                    <!-- Course -->
+                    <div
+                        class="w-full md:flex-1 flex items-center gap-3 px-4 py-2 border-b md:border-b-0 md:border-r border-gray-100">
+                        <div
+                            class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                            </svg>
+                        </div>
+                        <div class="flex flex-col w-full">
+                            <label class="text-[10px] font-bold text-gray-900 uppercase tracking-wider">Course</label>
+                            <select [(ngModel)]="selectedCourse" (keyup.enter)="onSearch()"
+                                class="w-full bg-transparent text-xs text-gray-500 focus:outline-none cursor-pointer p-0 appearance-none">
+                                <option value="" disabled selected>Choose Course</option>
+                                <option *ngFor="let course of coursesList" [value]="course">{{ course }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Academic Year -->
+                    <div class="w-full md:flex-1 flex items-center gap-3 px-4 py-2">
+                        <div
+                            class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                            </svg>
+                        </div>
+                        <div class="flex flex-col w-full">
+                            <label class="text-[10px] font-bold text-gray-900 uppercase tracking-wider">Academic
+                                Year</label>
+                            <select [(ngModel)]="selectedYear" (keyup.enter)="onSearch()"
+                                class="w-full bg-transparent text-xs text-gray-500 focus:outline-none cursor-pointer p-0 appearance-none">
+                                <option value="" disabled selected>Select Academic Year</option>
+                                <option *ngFor="let year of academicYears" [value]="year">{{ year }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Search Button -->
+                    <button (click)="onSearch()"
+                        class="w-full md:w-auto bg-[#8B5CF6] hover:bg-indigo-600 text-white p-3 rounded-full shadow-lg transition-transform transform active:scale-95 flex-shrink-0 flex justify-center mt-2 md:mt-0 md:mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Purple Background behind Search Bar & Curve -->
+        <div class="absolute bottom-0 left-0 w-full h-[200px] bg-[#EBE6FF] z-0"></div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="relative bg-[#f8f9fe] pt-16 pb-16 mt-0">
+
+        <!-- Top Curve SVG (Hill/Convex) -->
+        <div class="absolute top-0 left-0 w-full overflow-hidden leading-none -translate-y-[98%]">
+            <svg class="relative block w-full h-[60px] md:h-[100px]" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 1440 100" preserveAspectRatio="none">
+                <path fill="#f8f9fe" fill-opacity="1" d="M0,100 L1440,100 L1440,50 Q720,0 0,50 Z"></path>
+            </svg>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+
+
+            <!-- No Results -->
+            <div *ngIf="!showEmptyState && !isLoading && papers.length === 0" class="text-center py-20">
+                <h2 class="text-xl font-bold text-gray-800 mb-2">No papers found</h2>
+                <p class="text-gray-500">Try adjusting your search criteria.</p>
+            </div>
+
+            <!-- Papers Grid -->
+            <div *ngIf="papers.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                <div *ngFor="let paper of papers"
+                    class="bg-white rounded-[1.5rem] p-6 shadow-sm border border-transparent hover:border-[#A855F7]/30 hover:shadow-xl transition-all duration-300 group">
+
+                    <!-- Card Header -->
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <!-- Laptop Icon -->
+                            <div
+                                class="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
+                                <svg *ngIf="paper.icon === 'server'" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                </svg>
+                                <svg *ngIf="paper.icon === 'terminal'" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                                </svg>
+                                <svg *ngIf="paper.icon === 'database'" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+                                </svg>
+                            </div>
+                            <span class="text-blue-500 font-bold text-xs tracking-wide">{{ paper.code }}</span>
+                        </div>
+                        <!-- Year Pill -->
+                        <span class="bg-[#DCFCE7] text-[#166534] px-3 py-1 rounded-full text-[10px] font-bold">{{
+                            paper.year
+                            }}</span>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="mb-6">
+                        <h3 class="text-gray-900 font-bold text-lg mb-1 leading-tight">{{ paper.title }}</h3>
+                        <p class="text-gray-400 text-xs font-medium">{{ paper.term }} • Semester {{ paper.sem }}</p>
+                    </div>
+
+                    <!-- Card Actions -->
+                    <div class="flex items-center justify-between pt-4 mt-auto border-t border-gray-50">
+                        <!-- Heart -->
+                        <button
+                            class="text-red-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50"
+                            (click)="toggleFavorite(paper); $event.stopPropagation()">
+                            <svg *ngIf="isFavorite(paper)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                fill="currentColor" class="w-5 h-5">
+                                <path
+                                    d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                            </svg>
+                            <svg *ngIf="!isFavorite(paper)" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                            </svg>
+                        </button>
+
+                        <div class="flex gap-2">
+                            <button (click)="viewPaper(paper)"
+                                class="bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold px-6 py-2 rounded-full shadow-lg shadow-blue-200 transition-transform active:scale-95">View</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load More Button -->
+            <div *ngIf="hasMorePapers && !showEmptyState && papers.length > 0" class="text-center mb-12">
+                <button (click)="loadMore()" [disabled]="isLoading"
+                    class="bg-[#F3F4F6] hover:bg-gray-200 text-slate-600 font-semibold px-8 py-3 rounded-full transition-all active:scale-95 disabled:opacity-50">
+                    {{ isLoading ? 'Loading...' : 'View All Papers' }}
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Section with Distinct Background -->
+    <section class="max-w-none w-full py-12 px-12 relative mt-12 bg-white/50">
+        <div class="max-w-4xl mx-auto">
+            <!-- Promo Banner -->
+            <div
+                class="w-full bg-[#8B5CF6] rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden text-white shadow-xl h-[240px] flex flex-col justify-center items-start">
+
+                <div class="relative z-10 w-full md:w-3/4">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 leading-tight">Can't Find Your Exam Papers?</h2>
+                    <p class="text-indigo-100 text-xs md:text-sm mb-6 font-medium">Give a request to our Team or Get
+                        Support from our Team</p>
+
+                    <div class="flex gap-4">
+                        <button
+                            class="bg-black text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-lg hover:bg-gray-800 transition-transform active:scale-95">
+                            Request Paper
+                        </button>
+                        <button
+                            class="bg-white text-[#8B5CF6] px-6 py-2.5 rounded-lg text-sm font-bold shadow-lg hover:bg-gray-50 transition-transform active:scale-95 border border-white">
+                            Contact US
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Rocket Image -->
+                <div
+                    class="absolute right-0 bottom-0 top-0 w-1/2 h-full flex items-end justify-end pointer-events-none">
+                    <img src="assets/images/image copy 2.png" alt="Rocket"
+                        class="h-[100%] w-auto object-contain object-bottom translate-y-[10%] translate-x-[15%] drop-shadow-2xl floating-animation">
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>

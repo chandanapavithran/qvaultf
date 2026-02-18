@@ -7,7 +7,7 @@ import { LoaderService } from './shared/loader/loader.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Toast, LoaderComponent],
+  imports: [RouterOutlet, Toast],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

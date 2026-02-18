@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { Auth } from '../core/services/auth';
 import { UserService } from '../core/services/user.service';
@@ -7,7 +8,7 @@ import { UserService } from '../core/services/user.service';
 @Component({
     selector: 'app-landing',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, FormsModule],
     templateUrl: './landing.html',
     styleUrl: './landing.scss'
 })
@@ -23,6 +24,7 @@ export class LandingComponent {
     isLoading = true;
     questionPapers: any[] = [];
     recentPapers: any[] = [];
+    favoritesList: any[] = [];
     maxDisplay = 6;
     departments: string[] = []; // Maps to 'program'
     courseCodes: string[] = []; // Maps to 'courseids'
@@ -35,7 +37,7 @@ export class LandingComponent {
 
     showProfileMenu = false;
 
-    constructor(private auth: Auth, private userService: UserService, private router: Router) {
+    constructor(private auth: Auth, private userService: UserService, private router: Router, private cdr: ChangeDetectorRef) {
         const details = this.userService.getUserDetails();
         this.user.name = details.name;
         this.user.email = details.email;
@@ -49,6 +51,7 @@ export class LandingComponent {
 
     ngOnInit() {
         this.fetchHomeData();
+        this.fetchFavorites();
     }
 
     fetchHomeData() {
@@ -57,10 +60,30 @@ export class LandingComponent {
             next: (data) => {
                 this.homeData = data;
 
+                // Helper to safely extract ID
+                const getId = (p: any) => p._id?.$oid || p._id || p.id;
+                console.log('DEBUG: studentHome data:', data);
+
                 // Map Recommended Papers
                 this.questionPapers = (data.recommendedPapers || []).map((paper: any) => ({
                     ...paper,
-                    id: paper._id,
+                    id: getId(paper),
+                    title: paper.course,
+                    tag: paper.courseid,
+                    year: paper.year,
+                    term: paper.term,
+                    sem: paper.sem,
+                    icon: this.getRandomIcon(paper.course),
+                    color: this.getRandomColor()
+                }));
+
+                // Map Favorites (from Home Data - Top 6)
+                // Handle both British and American spelling just in case
+                const favs = data.favourites || data.favorites || [];
+                console.log('DEBUG: raw favorites from home:', favs);
+                this.favoritesList = favs.map((paper: any) => ({
+                    ...paper,
+                    id: getId(paper),
                     title: paper.course,
                     tag: paper.courseid,
                     year: paper.year,
@@ -73,7 +96,7 @@ export class LandingComponent {
                 // Map Recents
                 this.recentPapers = (data.recents || []).map((paper: any) => ({
                     ...paper,
-                    id: paper._id,
+                    id: getId(paper),
                     title: paper.course,
                     tag: paper.courseid,
                     year: paper.year,
@@ -94,10 +117,29 @@ export class LandingComponent {
 
                 this.isLoading = false;
                 console.log('Home Data:', data);
+                this.cdr.detectChanges(); // Force update
             },
             error: (err) => {
                 console.error('Error fetching home data:', err);
                 this.isLoading = false;
+                this.cdr.detectChanges(); // Force update on error too
+            }
+        });
+    }
+
+    // Search Filters
+    selectedSession: string = '';
+    selectedCode: string = '';
+    selectedCourse: string = '';
+    selectedYear: string = '';
+
+    navigateToSearch() {
+        this.router.navigate(['/search'], {
+            queryParams: {
+                session: this.selectedSession,
+                code: this.selectedCode,
+                course: this.selectedCourse,
+                year: this.selectedYear
             }
         });
     }
@@ -123,5 +165,99 @@ export class LandingComponent {
     getRandomColor(): string {
         const colors = ['bg-orange-100', 'bg-blue-100', 'bg-blue-50', 'bg-purple-100', 'bg-green-100', 'bg-red-100', 'bg-yellow-100'];
         return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    // Favorites Logic
+    favoriteIds: Set<string> = new Set();
+
+    fetchFavorites() {
+        this.userService.getFavorites().subscribe({
+            next: (data) => {
+                if (data && data.favorites) {
+                    this.favoriteIds = new Set(data.favorites.map((f: any) => f._id?.$oid || f._id));
+                }
+            },
+            error: (err) => console.error('Error fetching favorites:', err)
+        });
+    }
+
+    toggleFavorite(paper: any) {
+        const id = paper.id || paper._id?.$oid || paper._id;
+        if (!id) {
+            console.error('Paper has no ID:', paper);
+            return;
+        }
+
+        if (this.favoriteIds.has(id)) {
+            // Optimistic Remove
+            this.favoriteIds.delete(id);
+            this.favoritesList = this.favoritesList.filter(f => {
+                const fId = f.id || f._id?.$oid || f._id;
+                return fId !== id;
+            });
+            this.cdr.detectChanges(); // Ensure view updates immediately
+
+            this.userService.removeFromFavorites(id).subscribe({
+                next: () => console.log('Removed from favorites:', id),
+                error: (err) => {
+                    console.error('Error removing favorite:', err);
+                    this.favoriteIds.add(id); // Revert
+                    this.favoritesList.push(paper); // Revert list
+                }
+            });
+        } else {
+            // Optimistic Add
+            this.favoriteIds.add(id);
+            // Add to favoritesList (ensure consistent format)
+            const newFav = {
+                ...paper,
+                id: id,
+                // Ensure specific fields if missing from 'paper' source
+                title: paper.title || paper.course,
+                tag: paper.tag || paper.courseid,
+                year: paper.year,
+                term: paper.term,
+                sem: paper.sem,
+                icon: paper.icon || this.getRandomIcon(paper.course),
+                color: paper.color || this.getRandomColor()
+            };
+            this.favoritesList = [...this.favoritesList, newFav]; // Immutable update
+            this.cdr.detectChanges(); // Ensure view updates immediately
+
+            this.userService.addToFavorites(id).subscribe({
+                next: () => console.log('Added to favorites:', id),
+                error: (err) => {
+                    console.error('Error adding favorite:', err);
+                    this.favoriteIds.delete(id); // Revert
+                    this.favoritesList = this.favoritesList.filter(f => f.id !== id); // Revert list
+                }
+            });
+        }
+    }
+
+    isFavorite(paper: any): boolean {
+        const id = paper.id || paper._id?.$oid || paper._id;
+        return this.favoriteIds.has(id);
+    }
+
+    viewPaper(paper: any) {
+        const id = paper.id || paper._id?.$oid || paper._id;
+        if (!id) {
+            console.error('Paper has no ID:', paper);
+            return;
+        }
+
+        this.userService.viewPaper(id).subscribe({
+            next: (data: any) => {
+                if (data && data.url) {
+                    window.open(data.url, '_blank');
+                    // Refresh data after view if needed (like recents update)
+                    // Optional: this.fetchHomeData();
+                } else {
+                    console.error('No URL returned for paper:', id);
+                }
+            },
+            error: (err) => console.error('Error viewing paper:', err)
+        });
     }
 }
