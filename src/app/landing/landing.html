@@ -34,85 +34,89 @@
                     verified, and easily accessible to help you prepare smarter and score better in your college exams!
                 </p>
 
-                <!-- Search Bar -->
-                <div
-                    class="bg-white p-2 sm:p-3 rounded-full shadow-[-15px_15px_0_0_#7C3AED] flex items-center border-[2.5px] border-[#7C3AED] mt-8 max-w-4xl w-full relative z-30">
+                <!-- Search Bar Container -->
+                <div class="flex flex-col gap-2 mt-8 w-full max-w-4xl">
+                    <!-- Search Bar -->
+                    <div
+                        class="bg-white p-2 sm:p-3 rounded-full shadow-[-15px_15px_0_0_#7C3AED] flex items-center border-[2.5px] border-[#7C3AED] transition-colors relative z-30">
 
-                    <!-- Course Code -->
-                    <div class="flex-1 flex items-center gap-3 px-4 lg:px-6">
-                        <div class="text-gray-400 shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="w-6 h-6">
+                        <!-- Course (Combined Code & Name) -->
+                        <div class="flex-1 flex items-center gap-3 px-4 lg:px-6">
+                            <div class="text-gray-400 shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0h18M5 21h14a2 2 0 002-2v-3.25" />
+                                </svg>
+                            </div>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-sm font-bold text-gray-900 truncate">Course Code</span>
+                                <select [(ngModel)]="selectedCourse" (change)="onDropdownChange('course')"
+                                    class="bg-transparent text-xs text-slate-400 focus:outline-none placeholder-slate-400 w-full appearance-none cursor-pointer">
+                                    <option value="" disabled selected>Select Course</option>
+                                    <option *ngFor="let course of coursesList" [value]="course">{{ course }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="hidden md:block w-px h-10 bg-gray-100"></div>
+
+                        <!-- Academic Year -->
+                        <div [class.opacity-40]="!selectedCourse" class="flex-1 flex items-center gap-3 px-4 lg:px-6">
+                            <div class="text-gray-400 shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                                </svg>
+                            </div>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-sm font-bold text-gray-900 truncate">Academic Year</span>
+                                <select [disabled]="!selectedCourse" [(ngModel)]="selectedYear"
+                                    (change)="onDropdownChange('year')" (keydown.enter)="navigateToSearch()"
+                                    class="bg-transparent text-xs text-slate-400 focus:outline-none cursor-pointer appearance-none w-full disabled:cursor-not-allowed">
+                                    <option value="" disabled selected>Select Academic Year</option>
+                                    <option *ngFor="let year of academicYears" [value]="year">{{ year }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="hidden md:block w-px h-10 bg-gray-100"></div>
+
+                        <!-- Exam Session -->
+                        <div [class.opacity-40]="!selectedCourse" class="flex-1 flex items-center gap-3 px-4 lg:px-6">
+                            <div class="text-gray-400 shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                            </div>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-sm font-bold text-gray-900 truncate">Exam Session</span>
+                                <select [disabled]="!selectedCourse" [(ngModel)]="selectedSession"
+                                    (change)="onDropdownChange('term')" (keyup.enter)="navigateToSearch()"
+                                    class="bg-transparent text-xs text-slate-400 focus:outline-none cursor-pointer appearance-none w-full disabled:cursor-not-allowed">
+                                    <option value="" disabled selected>Choose a Session</option>
+                                    <option *ngFor="let term of years" [value]="term">{{ term }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Search Button -->
+                        <button (click)="navigateToSearch()"
+                            class="w-12 h-12 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-full shadow-lg transition-all transform active:scale-95 flex-shrink-0 flex items-center justify-center ml-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                                stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0h18M5 21h14a2 2 0 002-2v-3.25" />
+                                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                             </svg>
-                        </div>
-                        <div class="flex flex-col min-w-0">
-                            <span class="text-sm font-bold text-gray-900 truncate">Course Code</span>
-                            <input type="text" placeholder="Enter Course Code" list="courseCodesList"
-                                [(ngModel)]="selectedCode" (keyup.enter)="navigateToSearch()"
-                                class="bg-transparent text-xs text-slate-400 focus:outline-none placeholder-slate-400 w-full" />
-                            <datalist id="courseCodesList">
-                                <option *ngFor="let code of courseCodes" [value]="code"></option>
-                            </datalist>
-                        </div>
+                        </button>
                     </div>
-
-                    <!-- Divider -->
-                    <div class="hidden md:block w-px h-10 bg-gray-100"></div>
-
-                    <!-- Academic Year -->
-                    <div class="flex-1 flex items-center gap-3 px-4 lg:px-6">
-                        <div class="text-gray-400 shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                            </svg>
-                        </div>
-                        <div class="flex flex-col min-w-0">
-                            <span class="text-sm font-bold text-gray-900 truncate">Academic Year</span>
-                            <select [(ngModel)]="selectedYear" (keydown.enter)="navigateToSearch()"
-                                class="bg-transparent text-xs text-slate-400 focus:outline-none cursor-pointer appearance-none w-full">
-                                <option value="" disabled selected>Select Academic Year</option>
-                                <option *ngFor="let year of academicYears" [value]="year">{{ year }}</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Divider -->
-                    <div class="hidden md:block w-px h-10 bg-gray-100"></div>
-
-                    <!-- Exam Session -->
-                    <div class="flex-1 flex items-center gap-3 px-4 lg:px-6">
-                        <div class="text-gray-400 shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                            </svg>
-                        </div>
-                        <div class="flex flex-col min-w-0">
-                            <span class="text-sm font-bold text-gray-900 truncate">Exam Session</span>
-                            <select [(ngModel)]="selectedSession" (keyup.enter)="navigateToSearch()"
-                                class="bg-transparent text-xs text-slate-400 focus:outline-none cursor-pointer appearance-none w-full">
-                                <option value="" disabled selected>Choose a Session</option>
-                                <option *ngFor="let term of years" [value]="term">{{ term }}</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Search Button -->
-                    <button (click)="navigateToSearch()"
-                        class="w-12 h-12 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-full shadow-lg transition-all transform active:scale-95 flex-shrink-0 flex items-center justify-center ml-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                            stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                        </svg>
-                    </button>
                 </div>
             </div>
 
@@ -129,8 +133,8 @@
         <div class="absolute bottom-0 left-0 w-full h-[200px] bg-[#EBE6FF] z-0"></div>
     </section>
 
-    <!-- Question Papers Grid -->
-    <section class="relative bg-[#f8f9fe] pt-16 pb-16 mt-0">
+    <!-- Favorites Section (Detailed Cards) -->
+    <section *ngIf="favoritesList.length > 0" class="relative bg-[#f8f9fe] pt-16 pb-12 mt-0">
         <!-- Top Curve SVG (Hill/Convex) -->
         <div class="absolute top-0 left-0 w-full overflow-hidden leading-none -translate-y-[98%]">
             <svg class="relative block w-full h-[60px] md:h-[100px]" xmlns="http://www.w3.org/2000/svg"
@@ -140,19 +144,24 @@
         </div>
 
         <div class="px-12 pt-0">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800"><span class="text-[#8B5CF6]">Question Papers</span> For You
-                </h2>
-                <p class="text-gray-400 text-xs mt-2 uppercase tracking-wide">"One click away from all your exam prep
-                    materials"</p>
+            <div class="flex items-center justify-between mb-12 max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-800">Your <span class="text-[#8B5CF6]">Favourites</span></h2>
+                <button *ngIf="favoriteIds.size > 6" routerLink="/favorites"
+                    class="text-sm font-bold text-[#8B5CF6] hover:text-[#7C3AED] transition-colors flex items-center gap-1">
+                    View All
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                </button>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                <div *ngFor="let paper of questionPapers | slice:0:maxDisplay"
-                    class="group bg-white rounded-[1.5rem] p-5 border border-transparent hover:border-blue-100 hover:shadow-xl transition-all duration-300 cursor-pointer relative overflow-hidden">
+                <div *ngFor="let paper of favoritesList | slice:0:maxDisplay"
+                    class="group bg-white rounded-[2rem] p-6 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer relative overflow-hidden flex flex-col border border-gray-50">
 
-                    <!-- Top Row: Icon, Course ID, Year -->
-                    <div class="flex items-start justify-between mb-4">
+                    <!-- Top Row: Icon, Code, Year -->
+                    <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-500 shrink-0">
@@ -172,182 +181,89 @@
                                         d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
                                 </svg>
                             </div>
-                            <span class="text-blue-500 font-semibold text-xs">{{ paper.tag }}</span>
+                            <span class="text-blue-600 font-bold text-sm">{{ paper.subjectCode }}</span>
                         </div>
-
-                        <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">{{
-                            paper.year }}</span>
+                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">{{ paper.year
+                            }}</span>
                     </div>
 
                     <!-- Content -->
-                    <div class="mb-6">
-                        <h3 class="text-lg font-bold text-gray-900 leading-tight mb-1">{{ paper.title }}</h3>
-                        <p class="text-gray-400 text-xs font-medium">
-                            {{ paper.term }} &bull; Semester {{ paper.sem }}
-                        </p>
+                    <div class="mb-8 flex-grow">
+                        <h3 class="text-xl font-bold text-gray-900 leading-tight mb-2 line-clamp-2 h-14">
+                            {{ paper.subjectName }}
+                        </h3>
+                        <p class="text-gray-400 text-sm font-medium">{{ paper.examType }}</p>
                     </div>
 
                     <!-- Actions -->
-                    <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
-                        <button class="text-red-400 hover:text-red-500 transition-colors"
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-50">
+                        <button class="text-red-500 hover:scale-110 transition-transform"
                             (click)="toggleFavorite(paper); $event.stopPropagation()">
-                            <svg *ngIf="isFavorite(paper)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                fill="currentColor" class="w-5 h-5">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-6 h-6">
                                 <path
                                     d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
                             </svg>
-                            <svg *ngIf="!isFavorite(paper)" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                            </svg>
                         </button>
-                        <div class="flex gap-2">
-                            <button (click)="viewPaper(paper)"
-                                class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-5 py-2 rounded-full shadow-lg shadow-blue-200 transition-all active:scale-95">View</button>
-                        </div>
+                        <button (click)="viewPaper(paper)"
+                            class="bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-bold px-8 py-2 rounded-full shadow-lg shadow-blue-100 transition-all active:scale-95">
+                            View
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div class="text-center mt-12" *ngIf="questionPapers.length > maxDisplay">
-                <button class="text-blue-400 text-sm font-semibold hover:text-blue-600 transition-colors">View
+            <div class="text-center mt-12">
+                <button (click)="navigateToSearch()" class="text-blue-500 text-sm font-bold hover:underline">View
                     all</button>
             </div>
         </div>
     </section>
 
-    <!-- Favorites Section (Grid Layout) -->
-    <section *ngIf="favoritesList.length > 0" class="relative bg-[#f8f9fe] pt-4 pb-8">
-        <div class="px-12 pt-0">
-            <div class="flex items-center justify-between mb-8 max-w-7xl mx-auto">
-                <h2 class="text-3xl font-bold text-gray-800"><span class="text-black">Your Favorites</span></h2>
-                <button *ngIf="favoriteIds.size > 6" routerLink="/favorites"
-                    class="text-sm font-bold text-[#8B5CF6] hover:text-[#7C3AED] transition-colors flex items-center gap-1">
-                    View All
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                    </svg>
-                </button>
-            </div>
+    <!-- Recently Accessed (Compact View) -->
+    <section class="bg-white py-16">
+        <div class="px-12 max-w-[1400px] mx-auto">
+            <h3 class="text-2xl font-bold text-gray-800 mb-10 font-serif">Recently Accessed</h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                <div *ngFor="let paper of favoritesList"
-                    class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow cursor-pointer relative overflow-hidden">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
+                <div *ngFor="let paper of recentPapers"
+                    class="group bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col h-[280px] w-full max-w-[180px] mx-auto">
 
-                    <!-- Top Row: Icon and Year -->
-                    <div class="flex justify-between items-start mb-4">
-                        <div
-                            class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 shrink-0">
-                            <!-- Dynamic Icons matching existing logic but with Blue styling -->
-                            <svg *ngIf="paper.icon === 'server'" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                            </svg>
-                            <svg *ngIf="paper.icon === 'terminal'" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
-                            </svg>
-                            <svg *ngIf="paper.icon === 'database'" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
-                            </svg>
-                            <!-- Default Icon if none matches -->
-                            <svg *ngIf="!paper.icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    <div class="flex-grow">
+                        <p class="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-2">{{
+                            paper.subjectCode }}</p>
+                        <h4 class="font-bold text-gray-800 text-xs leading-relaxed line-clamp-4 mb-3">
+                            {{ paper.subjectName }}
+                        </h4>
+                       
+                    </div>
+
+                    <div class="flex items-center gap-2 mt-4 pt-3 border-t border-gray-50">
+                        <!-- Eye Icon -->
+                        <div (click)="viewPaper(paper)"
+                            class="w-7 h-7 rounded-full bg-green-50 flex items-center justify-center text-green-500 hover:bg-green-100 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                class="w-3.5 h-3.5">
+                                <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
+                                <path fill-rule="evenodd"
+                                    d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 8.201 2.372 9.336 6.404.332.61.332 1.341 0 1.951C17.79 15.628 14.162 18 10 18c-4.257 0-8.201-2.372-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                                    clip-rule="evenodd" />
                             </svg>
                         </div>
-                        <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded">{{ paper.year
-                            }}</span>
-                    </div>
 
-                    <!-- Content -->
-                    <div class="mb-4">
-                        <h3 class="font-semibold text-gray-900 leading-tight mb-1">{{ paper.subjectName }}</h3>
-                        <p class="text-xs text-blue-600 font-medium mb-1">{{ paper.subjectCode }}</p>
-                        <p class="text-xs text-gray-500">{{ paper.examType }}</p>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="flex items-center justify-between mt-4">
-                        <button class="text-red-500 hover:text-red-700 transition-colors"
-                            (click)="toggleFavorite(paper); $event.stopPropagation()">
-                            <!-- Filled Heart (As these are in Favorites section) -->
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                class="w-5 h-5">
+                        <!-- Heart Icon -->
+                        <div (click)="toggleFavorite(paper); $event.stopPropagation()"
+                            class="w-7 h-7 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-100 transition-colors">
+                            <svg *ngIf="isFavorite(paper)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                fill="currentColor" class="w-3.5 h-3.5">
                                 <path
-                                    d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                                    d="M9.653 16.915l-.005-.003-.019-.01a12.978 12.978 0 01-.634-.37 19.702 19.702 0 01-3.198-2.433c-2.113-2.07-3.547-4.595-3.547-7.847 0-2.44 1.748-4.25 4.022-4.25 1.522 0 2.72.73 3.328 1.838.608-1.108 1.806-1.838 3.328-1.838 2.274 0 4.022 1.81 4.022 4.25 0 3.252-1.434 5.777-3.547 7.847-1.047 1.012-2.11 1.848-3.198 2.433a12.978 12.978 0 01-.634.37l-.019.01-.005.003h-.001a.739.739 0 01-.39.114.739.739 0 01-.391-.114l-.001-.001z" />
                             </svg>
-                        </button>
-                        <div class="flex gap-2">
-                            <button (click)="viewPaper(paper)"
-                                class="px-4 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-full hover:bg-blue-700 transition-colors">
-                                View
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Recently Accessed & Footer -->
-    <section class="bg-white border-t border-gray-100">
-        <div class="max-w-7xl mx-auto px-12 py-12 space-y-12">
-
-
-            <!-- Recently Accessed -->
-            <div *ngIf="recentPapers.length > 0">
-                <h3 class="text-2xl font-bold text-gray-800 mb-8 font-serif">Recently Accessed</h3>
-                <div class="flex overflow-x-auto gap-6 pb-8 no-scrollbar">
-                    <div *ngFor="let paper of recentPapers"
-                        class="min-w-[220px] bg-white rounded-xl p-6 border border-gray-100 hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between h-[280px]">
-
-                        <div>
-                            <p class="text-gray-500 text-xs font-semibold mb-3">{{ paper.code || '22BCLA12J22' }}</p>
-                            <h4 class="font-bold text-gray-800 text-sm mb-2 leading-relaxed line-clamp-3">
-                                {{ paper.title }}
-                            </h4>
-                            <!-- Mock Date for now -->
-                            <p class="text-[10px] text-red-400 font-medium mt-2">09 March, 2025</p>
-                        </div>
-
-                        <div class="flex items-center gap-3 mt-4 pt-4 border-t border-gray-50">
-                            <!-- View Icon -->
-                            <div (click)="viewPaper(paper)"
-                                class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-500 hover:bg-green-100 transition-colors cursor-pointer">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                    class="w-4 h-4">
-                                    <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
-                                    <path fill-rule="evenodd"
-                                        d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 8.201 2.372 9.336 6.404.332.61.332 1.341 0 1.951C17.79 15.628 14.162 18 10 18c-4.257 0-8.201-2.372-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-
-                            <!-- Download Icon Removed -->
-
-                            <!-- Heart Icon -->
-                            <!-- Heart Icon -->
-                            <button class="text-red-400 hover:text-red-500 transition-colors ml-auto"
-                                (click)="toggleFavorite(paper); $event.stopPropagation()">
-                                <svg *ngIf="isFavorite(paper)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                    fill="currentColor" class="w-5 h-5">
-                                    <path
-                                        d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-                                </svg>
-                                <svg *ngIf="!isFavorite(paper)" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                                </svg>
-                            </button>
+                            <svg *ngIf="!isFavorite(paper)" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                            </svg>
                         </div>
                     </div>
                 </div>

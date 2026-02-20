@@ -56,13 +56,13 @@ export class LandingComponent {
 
     fetchHomeData() {
         this.isLoading = true;
-        this.userService.getStudentHomeData().subscribe({
-            next: (data) => {
+        this.userService.getStudentHomeData2().subscribe({
+            next: (data: any) => {
                 this.homeData = data;
 
                 // Helper to safely extract ID
                 const getId = (p: any) => p._id?.$oid || p._id || p.id;
-                console.log('DEBUG: studentHome data:', data);
+                console.log('DEBUG: studentHome2 data:', data);
 
                 // Helper to deduplicate array by ID
                 const deduplicate = (arr: any[]) => {
@@ -74,71 +74,49 @@ export class LandingComponent {
                     return Array.from(unique.values());
                 };
 
-                // Map Favorites first to establish state
-                const favs = data.favourites || data.favorites || [];
-                this.favoritesList = deduplicate(favs.map((paper: any) => ({
+                // Map Favorites (from 'favourites' field in studenthome2)
+                const favs = data.favourites || [];
+                const mappedFavs = favs.map((paper: any) => ({
                     ...paper,
                     id: getId(paper),
-                    title: paper.course,          // Keep for backward compat if needed
-                    subjectName: paper.course,    // Match Favorites Component
-                    tag: paper.courseid,          // Keep for backward compat
-                    subjectCode: paper.courseid,  // Match Favorites Component
-                    year: paper.year,
-                    term: paper.term,
-                    sem: paper.sem,
-                    examType: `${paper.term} • Semester ${paper.sem}`, // Match Favorites Component
-                    icon: this.getRandomIcon(paper.course),
-                    color: this.getRandomColor()
-                })));
-
-                // Update Set for fast lookup
-                this.favoriteIds = new Set(this.favoritesList.map(f => f.id));
-
-                // Map Recommended Papers
-                const recommended = (data.recommendedPapers || []).map((paper: any) => ({
-                    ...paper,
-                    id: getId(paper),
-                    title: paper.course,
-                    tag: paper.courseid,
-                    year: paper.year,
-                    term: paper.term,
-                    sem: paper.sem,
+                    subjectName: paper.course,
+                    subjectCode: paper.courseid,
+                    examType: `${paper.term} • Semester ${paper.sem}`,
                     icon: this.getRandomIcon(paper.course),
                     color: this.getRandomColor()
                 }));
-                this.questionPapers = deduplicate(recommended);
+                this.favoritesList = deduplicate(mappedFavs);
+
+                // Update Set for fast lookup
+                this.favoriteIds = new Set(this.favoritesList.map(f => f.id));
 
                 // Map Recents
                 const recents = (data.recents || []).map((paper: any) => ({
                     ...paper,
                     id: getId(paper),
-                    title: paper.course,
-                    tag: paper.courseid,
-                    year: paper.year,
-                    term: paper.term,
-                    sem: paper.sem,
-                    code: paper.courseid,
+                    subjectName: paper.course,
+                    subjectCode: paper.courseid,
+                    examType: `${paper.term} • Semester ${paper.sem}`,
                     icon: this.getRandomIcon(paper.course),
                     color: this.getRandomColor()
                 }));
                 this.recentPapers = deduplicate(recents);
 
-                // Map Dropdowns directly from JSON arrays
-                this.coursesList = data.courses || [];       // ["Cloud Computing", ...]
-                this.courseCodes = data.courseids || [];     // ["21BCA2T322", ...]
-                this.types = data.types || [];               // ["UG"]
-                this.years = data.terms || [];               // ["End Sem", "Mid Sem"]
-                this.academicYears = data.year || [];        // ["2022", "2023", "2024"]
-                this.departments = data.program || [];       // ["BCA"]
+                // Map Dropdowns
+                this.coursesList = data.courses || [];       // ["ID - Name", ...]
+                this.types = data.types || [];
+
+                // Initialize dependent dropdowns as empty (they will be filled by searchlist)
+                this.years = [];               // Sessions
+                this.academicYears = [];        // Years
 
                 this.isLoading = false;
-                console.log('Home Data:', data);
-                this.cdr.detectChanges(); // Force update
+                this.cdr.detectChanges();
             },
-            error: (err) => {
+            error: (err: any) => {
                 console.error('Error fetching home data:', err);
                 this.isLoading = false;
-                this.cdr.detectChanges(); // Force update on error too
+                this.cdr.detectChanges();
             }
         });
     }
@@ -149,11 +127,42 @@ export class LandingComponent {
     selectedCourse: string = '';
     selectedYear: string = '';
 
+    // ✅ Dynamic Dropdown Sync
+    onDropdownChange(type: string) {
+        console.log(`Dropdown changed: ${type}`, this.selectedCourse, this.selectedYear, this.selectedSession);
+
+        // If course changes, clear dependent selections and lists
+        if (type === 'course') {
+            this.selectedYear = '';
+            this.selectedSession = '';
+            this.years = [];
+            this.academicYears = [];
+        }
+
+        // Only trigger searchlist if course is selected
+        if (!this.selectedCourse) return;
+
+        const filters = {
+            course: this.selectedCourse,
+            year: this.selectedYear,
+            term: this.selectedSession
+        };
+
+        this.userService.getSearchList(filters).subscribe({
+            next: (data: any) => {
+                console.log('SearchList response:', data);
+                if (data.years) this.academicYears = data.years;
+                if (data.terms) this.years = data.terms;
+                this.cdr.detectChanges();
+            },
+            error: (err: any) => console.error('Error syncing dropdowns:', err)
+        });
+    }
+
     navigateToSearch() {
         this.router.navigate(['/search'], {
             queryParams: {
-                session: this.selectedSession,
-                code: this.selectedCode,
+                term: this.selectedSession,
                 course: this.selectedCourse,
                 year: this.selectedYear
             }
@@ -188,7 +197,7 @@ export class LandingComponent {
 
     fetchFavorites() {
         this.userService.getFavorites().subscribe({
-            next: (data) => {
+            next: (data: any) => {
                 if (data && data.favorites) {
                     const getId = (p: any) => p._id?.$oid || p._id || p.id;
                     this.favoritesList = data.favorites.map((paper: any) => ({
@@ -209,7 +218,7 @@ export class LandingComponent {
                     this.cdr.detectChanges();
                 }
             },
-            error: (err) => console.error('Error fetching favorites:', err)
+            error: (err: any) => console.error('Error fetching favorites:', err)
         });
     }
 
@@ -231,7 +240,7 @@ export class LandingComponent {
 
             this.userService.removeFromFavorites(id).subscribe({
                 next: () => console.log('Removed from favorites:', id),
-                error: (err) => {
+                error: (err: any) => {
                     console.error('Error removing favorite:', err);
                     this.favoriteIds.add(id); // Revert
                     this.favoritesList.push(paper); // Revert list
@@ -258,7 +267,7 @@ export class LandingComponent {
 
             this.userService.addToFavorites(id).subscribe({
                 next: () => console.log('Added to favorites:', id),
-                error: (err) => {
+                error: (err: any) => {
                     console.error('Error adding favorite:', err);
                     this.favoriteIds.delete(id); // Revert
                     this.favoritesList = this.favoritesList.filter(f => f.id !== id); // Revert list
@@ -289,7 +298,7 @@ export class LandingComponent {
                     console.error('No URL returned for paper:', id);
                 }
             },
-            error: (err) => console.error('Error viewing paper:', err)
+            error: (err: any) => console.error('Error viewing paper:', err)
         });
     }
 }

@@ -33,6 +33,7 @@ export class SearchComponent implements OnInit {
     years: string[] = [];
     academicYears: string[] = [];
     types: string[] = [];
+    courseError: boolean = false;
 
     // Local Search Inputs
     selectedSession: string = '';
@@ -53,28 +54,34 @@ export class SearchComponent implements OnInit {
 
     ngOnInit() {
         // 1. Fetch Dropdown Data (same as Landing)
-        this.userService.getStudentHomeData().subscribe({
-            next: (data) => {
+        this.userService.getStudentHomeData2().subscribe({
+            next: (data: any) => {
                 this.coursesList = data.courses || [];
-                this.courseCodes = data.courseids || [];
                 this.types = data.types || [];
-                this.years = data.terms || [];
-                this.academicYears = data.year || [];
-                this.departments = data.program || [];
+
+                // Initialize dependent dropdowns as empty
+                if (!this.selectedCourse) {
+                    this.years = [];
+                    this.academicYears = [];
+                }
             },
-            error: (err) => console.error('Error fetching dropdown data:', err)
+            error: (err: any) => console.error('Error fetching dropdown data:', err)
         });
 
         // 2. Handle Query Params & Initial Search
         this.route.queryParams.subscribe(params => {
             console.log('SearchComponent: QueryParams changed', params);
             // Pre-fill inputs from query params
-            this.selectedSession = params['session'] || '';
-            this.selectedCode = params['code'] || '';
+            this.selectedSession = params['term'] || '';
             this.selectedCourse = params['course'] || '';
             this.selectedYear = params['year'] || '';
 
-            // Always search on load, even with no params (View All)
+            // If we have a course, sync dropdowns to fill the Year/Session lists
+            if (this.selectedCourse) {
+                this.onDropdownChange('course');
+            }
+
+            // Always search on load
             this.showEmptyState = false;
             this.currentFilters = params;
             this.currentPage = 0;
@@ -86,32 +93,59 @@ export class SearchComponent implements OnInit {
         this.fetchFavorites();
     }
 
+    // ✅ Dynamic Dropdown Sync
+    onDropdownChange(type: string) {
+        if (this.selectedCourse) this.courseError = false;
+
+        if (type === 'course') {
+            this.selectedYear = '';
+            this.selectedSession = '';
+            this.years = [];
+            this.academicYears = [];
+        }
+
+        if (!this.selectedCourse) return;
+
+        const filters = {
+            course: this.selectedCourse,
+            year: this.selectedYear,
+            term: this.selectedSession
+        };
+
+        this.userService.getSearchList(filters).subscribe({
+            next: (data: any) => {
+                if (data.years) this.academicYears = data.years;
+                if (data.terms) this.years = data.terms;
+            },
+            error: (err: any) => console.error('Error syncing dropdowns:', err)
+        });
+    }
+
     // Triggered by the Search Button in the new UI
     onSearch() {
-        // Update currentFilters from visible UI elements
+        if (!this.selectedCourse) {
+            this.courseError = true;
+            return;
+        }
+
         this.currentFilters = {
-            session: this.selectedSession,
-            code: this.selectedCode,
+            term: this.selectedSession,
+            course: this.selectedCourse,
             year: this.selectedYear
         };
 
-        // Update URL without reloading to keep state in sync
+        // Update URL
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: this.currentFilters,
-            queryParamsHandling: 'merge', // merge with existing if any
+            queryParamsHandling: 'merge',
         });
-
-        // The queryParams subscription will trigger fetchPapers, so we might not need to call it manually here
-        // But to be explicit and avoid race conditions if subscription doesn't fire on same params:
-        // Actually, navigating updates params -> triggers subscription -> triggers fetch.
-        // So just navigating is enough.
     }
 
     fetchPapers() {
         this.isLoading = true;
         this.userService.searchPapers(this.currentFilters, this.currentPage).subscribe({
-            next: (data) => {
+            next: (data: any) => {
                 this.isLoading = false;
 
                 // Backend returns {page: "end"} if no more data
@@ -128,12 +162,9 @@ export class SearchComponent implements OnInit {
                     const newPapers = data.map((paper: any) => ({
                         ...paper,
                         id: getId(paper),
-                        title: paper.course,
-                        tag: paper.courseid,
-                        year: paper.year,
-                        term: paper.term,
-                        sem: paper.sem,
-                        code: paper.courseid,
+                        subjectName: paper.course,
+                        subjectCode: paper.courseid,
+                        examType: `${paper.term} • Semester ${paper.sem}`,
                         icon: this.getRandomIcon(paper.course),
                         color: this.getRandomColor()
                     }));
@@ -151,7 +182,7 @@ export class SearchComponent implements OnInit {
                     }
                 }
             },
-            error: (err) => {
+            error: (err: any) => {
                 console.error('Error fetching papers:', err);
                 this.isLoading = false;
             }
@@ -191,13 +222,13 @@ export class SearchComponent implements OnInit {
 
     fetchFavorites() {
         this.userService.getFavorites().subscribe({
-            next: (data) => {
+            next: (data: any) => {
                 const favs = data.favorites || data.favourites || [];
                 if (favs) {
                     this.favoriteIds = new Set(favs.map((f: any) => f._id?.$oid || f._id));
                 }
             },
-            error: (err) => console.error('Error fetching favorites:', err)
+            error: (err: any) => console.error('Error fetching favorites:', err)
         });
     }
 
@@ -210,7 +241,7 @@ export class SearchComponent implements OnInit {
             this.favoriteIds.delete(id);
             this.userService.removeFromFavorites(id).subscribe({
                 next: () => console.log('Removed from favorites:', id),
-                error: (err) => {
+                error: (err: any) => {
                     console.error('Error removing favorite:', err);
                     this.favoriteIds.add(id); // Revert
                 }
@@ -220,7 +251,7 @@ export class SearchComponent implements OnInit {
             this.favoriteIds.add(id);
             this.userService.addToFavorites(id).subscribe({
                 next: () => console.log('Added to favorites:', id),
-                error: (err) => {
+                error: (err: any) => {
                     console.error('Error adding favorite:', err);
                     this.favoriteIds.delete(id); // Revert
                 }
@@ -245,7 +276,7 @@ export class SearchComponent implements OnInit {
                     console.error('No URL returned for paper:', id);
                 }
             },
-            error: (err) => console.error('Error viewing paper:', err)
+            error: (err: any) => console.error('Error viewing paper:', err)
         });
     }
 }

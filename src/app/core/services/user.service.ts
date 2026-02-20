@@ -124,43 +124,40 @@ export class UserService {
         }
     }
 
-    private homeDataCache: any = null;
-
-    // ✅ Get Student Home Data (with Caching)
-    getStudentHomeData(): Observable<any> {
-        if (this.homeDataCache) {
-            return of(this.homeDataCache);
-        }
-
-        return this.http.get(`${this.baseUrl}/studenthome`, {
+    // ✅ Get Student Home Data v2
+    getStudentHomeData2(): Observable<any> {
+        return this.http.get(`${this.baseUrl}/studenthome2`, {
             headers: this.getAuthHeaders(),
             responseType: 'json'
-        }).pipe(
-            tap((data: any) => this.homeDataCache = data)
-        );
+        });
+    }
+
+    // ✅ Get Search List (Dynamic Dropdowns)
+    getSearchList(filters: any): Observable<any> {
+        return this.http.post(`${this.baseUrl}/searchlist`, filters, {
+            headers: this.getAuthHeaders(),
+            responseType: 'json'
+        });
+    }
+
+    // ✅ Search Papers
+    searchPapers(filters: any, page: number): Observable<any> {
+        const body = {
+            course: filters.course || '',
+            year: filters.year || '',
+            term: filters.term || '',
+            page: page
+        };
+
+        return this.http.post(`${this.baseUrl}/searchfilternew`, body, {
+            headers: this.getAuthHeaders(),
+            responseType: 'json'
+        });
     }
 
     // ✅ Clear Home Data Cache
     clearHomeCache(): void {
-        this.homeDataCache = null;
-    }
-
-    // ✅ Search Papers (No Caching - Force Flush)
-    // ✅ Search Papers (POST Method - Required by Backend Body)
-    searchPapers(filters: any, page: number): Observable<any> {
-        console.log('UserService: searchPapers called (POST)', filters);
-        const body = {
-            course: filters.course || '',
-            code: filters.code || '',
-            year: filters.year || '',
-            session: filters.session || '',
-            page: page
-        };
-
-        return this.http.post(`${this.baseUrl}/searchfilter`, body, {
-            headers: this.getAuthHeaders(),
-            responseType: 'json'
-        });
+        // No-op for now as v2 doesn't cache yet, but keeping for lint/compilation
     }
 
     // ✅ Add to Favorites
