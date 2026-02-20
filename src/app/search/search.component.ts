@@ -88,12 +88,10 @@ export class SearchComponent implements OnInit {
 
     // Triggered by the Search Button in the new UI
     onSearch() {
-        // Update URL to reflect new search (optional, but good for sharing/refresh)
-        // Or just update currentFilters and fetch
+        // Update currentFilters from visible UI elements
         this.currentFilters = {
             session: this.selectedSession,
             code: this.selectedCode,
-            course: this.selectedCourse,
             year: this.selectedYear
         };
 

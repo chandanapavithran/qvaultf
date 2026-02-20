@@ -7,7 +7,7 @@ import { tap, catchError } from 'rxjs/operators';
     providedIn: 'root'
 })
 export class UserService {
-    private baseUrl = 'http://172.19.0.147:8080/qvault';
+    private baseUrl = 'http://172.18.0.201:8080/qvault';
 
     constructor(private http: HttpClient) { }
 
@@ -219,6 +219,20 @@ export class UserService {
             tap(res => console.log('UserService: viewPaper success response:', res)),
             catchError(err => {
                 console.error('UserService: viewPaper failed:', err);
+                throw err;
+            })
+        );
+    }
+    // ✅ Request Paper
+    requestPaper(body: any): Observable<any> {
+        console.log('UserService: requestPaper called', body);
+        return this.http.post(`${this.baseUrl}/requestpaper`, body, {
+            headers: this.getAuthHeaders(),
+            responseType: 'json'
+        }).pipe(
+            tap(res => console.log('UserService: requestPaper success response:', res)),
+            catchError(err => {
+                console.error('UserService: requestPaper failed:', err);
                 throw err;
             })
         );

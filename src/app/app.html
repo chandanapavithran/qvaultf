@@ -1,2 +1,7 @@
 <app-toast></app-toast>
+<app-header *ngIf="showFooter"></app-header>
 <router-outlet></router-outlet>
+
+<footer *ngIf="showFooter" class="py-12 text-center text-slate-400 text-xs border-t border-slate-100 bg-white">
+    © 2024 Kristu Jayanti University. All rights reserved.
+</footer>

@@ -64,24 +64,38 @@ export class LandingComponent {
                 const getId = (p: any) => p._id?.$oid || p._id || p.id;
                 console.log('DEBUG: studentHome data:', data);
 
-                // Map Recommended Papers
-                this.questionPapers = (data.recommendedPapers || []).map((paper: any) => ({
-                    ...paper,
-                    id: getId(paper),
-                    title: paper.course,
-                    tag: paper.courseid,
-                    year: paper.year,
-                    term: paper.term,
-                    sem: paper.sem,
-                    icon: this.getRandomIcon(paper.course),
-                    color: this.getRandomColor()
-                }));
+                // Helper to deduplicate array by ID
+                const deduplicate = (arr: any[]) => {
+                    const unique = new Map();
+                    arr.forEach(item => {
+                        const id = getId(item);
+                        if (!unique.has(id)) unique.set(id, item);
+                    });
+                    return Array.from(unique.values());
+                };
 
-                // Map Favorites (from Home Data - Top 6)
-                // Handle both British and American spelling just in case
+                // Map Favorites first to establish state
                 const favs = data.favourites || data.favorites || [];
-                console.log('DEBUG: raw favorites from home:', favs);
-                this.favoritesList = favs.map((paper: any) => ({
+                this.favoritesList = deduplicate(favs.map((paper: any) => ({
+                    ...paper,
+                    id: getId(paper),
+                    title: paper.course,          // Keep for backward compat if needed
+                    subjectName: paper.course,    // Match Favorites Component
+                    tag: paper.courseid,          // Keep for backward compat
+                    subjectCode: paper.courseid,  // Match Favorites Component
+                    year: paper.year,
+                    term: paper.term,
+                    sem: paper.sem,
+                    examType: `${paper.term} • Semester ${paper.sem}`, // Match Favorites Component
+                    icon: this.getRandomIcon(paper.course),
+                    color: this.getRandomColor()
+                })));
+
+                // Update Set for fast lookup
+                this.favoriteIds = new Set(this.favoritesList.map(f => f.id));
+
+                // Map Recommended Papers
+                const recommended = (data.recommendedPapers || []).map((paper: any) => ({
                     ...paper,
                     id: getId(paper),
                     title: paper.course,
@@ -92,9 +106,10 @@ export class LandingComponent {
                     icon: this.getRandomIcon(paper.course),
                     color: this.getRandomColor()
                 }));
+                this.questionPapers = deduplicate(recommended);
 
                 // Map Recents
-                this.recentPapers = (data.recents || []).map((paper: any) => ({
+                const recents = (data.recents || []).map((paper: any) => ({
                     ...paper,
                     id: getId(paper),
                     title: paper.course,
@@ -106,6 +121,7 @@ export class LandingComponent {
                     icon: this.getRandomIcon(paper.course),
                     color: this.getRandomColor()
                 }));
+                this.recentPapers = deduplicate(recents);
 
                 // Map Dropdowns directly from JSON arrays
                 this.coursesList = data.courses || [];       // ["Cloud Computing", ...]
@@ -174,7 +190,23 @@ export class LandingComponent {
         this.userService.getFavorites().subscribe({
             next: (data) => {
                 if (data && data.favorites) {
-                    this.favoriteIds = new Set(data.favorites.map((f: any) => f._id?.$oid || f._id));
+                    const getId = (p: any) => p._id?.$oid || p._id || p.id;
+                    this.favoritesList = data.favorites.map((paper: any) => ({
+                        ...paper,
+                        id: getId(paper),
+                        title: paper.course,
+                        subjectName: paper.course,
+                        tag: paper.courseid,
+                        subjectCode: paper.courseid,
+                        year: paper.year,
+                        term: paper.term,
+                        sem: paper.sem,
+                        examType: `${paper.term} • Semester ${paper.sem}`,
+                        icon: this.getRandomIcon(paper.course),
+                        color: this.getRandomColor()
+                    }));
+                    this.favoriteIds = new Set(this.favoritesList.map(f => f.id));
+                    this.cdr.detectChanges();
                 }
             },
             error: (err) => console.error('Error fetching favorites:', err)
