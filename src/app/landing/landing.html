@@ -49,13 +49,24 @@
                                         d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0h18M5 21h14a2 2 0 002-2v-3.25" />
                                 </svg>
                             </div>
-                            <div class="flex flex-col min-w-0">
+                            <div class="flex flex-col min-w-0 relative">
                                 <span class="text-sm font-bold text-gray-900 truncate">Course Code</span>
-                                <select [(ngModel)]="selectedCourse" (change)="onDropdownChange('course')"
-                                    class="bg-transparent text-xs text-slate-400 focus:outline-none placeholder-slate-400 w-full appearance-none cursor-pointer">
-                                    <option value="" disabled selected>Select Course</option>
-                                    <option *ngFor="let course of coursesList" [value]="course">{{ course }}</option>
-                                </select>
+                                <input type="text" [(ngModel)]="searchTerm" (input)="filterCourses()"
+                                    (focus)="toggleCourseDropdown()" (blur)="hideCourseDropdown()"
+                                    placeholder="Select Course"
+                                    class="bg-transparent text-xs text-slate-400 focus:outline-none placeholder-slate-400 w-full cursor-pointer">
+
+                                <!-- Searchable Dropdown List -->
+                                <div *ngIf="showCourseDropdown"
+                                    class="absolute top-full left-0 mt-2 w-72 max-h-60 overflow-y-auto bg-white border border-gray-200 rounded-xl shadow-2xl z-50">
+                                    <div *ngFor="let course of filteredCourses" (mousedown)="selectCourse(course)"
+                                        class="px-4 py-2 hover:bg-purple-50 cursor-pointer text-xs text-slate-600 transition-colors">
+                                        {{ course }}
+                                    </div>
+                                    <div *ngIf="filteredCourses.length === 0" class="px-4 py-2 text-xs text-slate-400">
+                                        No matches found
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -146,7 +157,7 @@
         <div class="px-12 pt-0">
             <div class="flex items-center justify-between mb-12 max-w-7xl mx-auto">
                 <h2 class="text-3xl font-bold text-gray-800">Your <span class="text-[#8B5CF6]">Favourites</span></h2>
-                <button *ngIf="favoriteIds.size > 6" routerLink="/favorites"
+                <button routerLink="/favorites"
                     class="text-sm font-bold text-[#8B5CF6] hover:text-[#7C3AED] transition-colors flex items-center gap-1">
                     View All
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -214,7 +225,7 @@
             </div>
 
             <div class="text-center mt-12">
-                <button (click)="navigateToSearch()" class="text-blue-500 text-sm font-bold hover:underline">View
+                <button routerLink="/favorites" class="text-blue-500 text-sm font-bold hover:underline">View
                     all</button>
             </div>
         </div>
@@ -235,7 +246,7 @@
                         <h4 class="font-bold text-gray-800 text-xs leading-relaxed line-clamp-4 mb-3">
                             {{ paper.subjectName }}
                         </h4>
-                       
+
                     </div>
 
                     <div class="flex items-center gap-2 mt-4 pt-3 border-t border-gray-50">
@@ -291,10 +302,7 @@
                                 class="bg-black text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-lg hover:bg-gray-800 transition-transform active:scale-95">
                                 Request Paper
                             </button>
-                            <button
-                                class="bg-white text-[#8B5CF6] px-6 py-2.5 rounded-lg text-sm font-bold shadow-lg hover:bg-gray-50 transition-transform active:scale-95 border border-white">
-                                Contact US
-                            </button>
+                           
                         </div>
                     </div>
 

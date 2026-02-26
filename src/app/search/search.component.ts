@@ -35,6 +35,11 @@ export class SearchComponent implements OnInit {
     types: string[] = [];
     courseError: boolean = false;
 
+    // Searchable Dropdown State
+    searchTerm: string = '';
+    showCourseDropdown: boolean = false;
+    filteredCourses: string[] = [];
+
     // Local Search Inputs
     selectedSession: string = '';
     selectedCode: string = '';
@@ -58,6 +63,7 @@ export class SearchComponent implements OnInit {
             next: (data: any) => {
                 this.coursesList = data.courses || [];
                 this.types = data.types || [];
+                this.filteredCourses = [...this.coursesList];
 
                 // Initialize dependent dropdowns as empty
                 if (!this.selectedCourse) {
@@ -102,6 +108,9 @@ export class SearchComponent implements OnInit {
             this.selectedSession = '';
             this.years = [];
             this.academicYears = [];
+
+            // Sync searchTerm with selectedCourse
+            this.searchTerm = this.selectedCourse;
         }
 
         if (!this.selectedCourse) return;
@@ -119,6 +128,47 @@ export class SearchComponent implements OnInit {
             },
             error: (err: any) => console.error('Error syncing dropdowns:', err)
         });
+    }
+
+    // Searchable Course Dropdown Methods
+    filterCourses() {
+        this.showCourseDropdown = true;
+        this.filteredCourses = this.coursesList.filter(course =>
+            course.toLowerCase().includes(this.searchTerm.toLowerCase())
+        );
+
+        // If user clears the input, clear the selection
+        if (!this.searchTerm) {
+            this.selectedCourse = '';
+            this.onDropdownChange('course');
+        }
+    }
+
+    selectCourse(course: string) {
+        this.selectedCourse = course;
+        this.searchTerm = course;
+        this.showCourseDropdown = false;
+        this.onDropdownChange('course');
+    }
+
+    toggleCourseDropdown() {
+        this.showCourseDropdown = !this.showCourseDropdown;
+        if (this.showCourseDropdown) {
+            this.filteredCourses = [...this.coursesList];
+        }
+    }
+
+    hideCourseDropdown() {
+        // Small delay to allow click event to register on dropdown items
+        setTimeout(() => {
+            this.showCourseDropdown = false;
+            // If nothing selected, revert searchTerm or clear it
+            if (!this.selectedCourse) {
+                this.searchTerm = '';
+            } else {
+                this.searchTerm = this.selectedCourse;
+            }
+        }, 200);
     }
 
     // Triggered by the Search Button in the new UI

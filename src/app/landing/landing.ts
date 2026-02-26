@@ -33,6 +33,11 @@ export class LandingComponent {
     academicYears: string[] = []; // Maps to 'year' (Academic Year)
     types: string[] = [];       // Maps to 'types'
 
+    // Searchable Dropdown State
+    searchTerm: string = '';
+    showCourseDropdown: boolean = false;
+    filteredCourses: string[] = [];
+
     // Rebuild Trigger
 
     showProfileMenu = false;
@@ -109,6 +114,7 @@ export class LandingComponent {
                 // Initialize dependent dropdowns as empty (they will be filled by searchlist)
                 this.years = [];               // Sessions
                 this.academicYears = [];        // Years
+                this.filteredCourses = [...this.coursesList];
 
                 this.isLoading = false;
                 this.cdr.detectChanges();
@@ -137,6 +143,9 @@ export class LandingComponent {
             this.selectedSession = '';
             this.years = [];
             this.academicYears = [];
+
+            // Sync searchTerm with selectedCourse
+            this.searchTerm = this.selectedCourse;
         }
 
         // Only trigger searchlist if course is selected
@@ -157,6 +166,48 @@ export class LandingComponent {
             },
             error: (err: any) => console.error('Error syncing dropdowns:', err)
         });
+    }
+
+    // Searchable Course Dropdown Methods
+    filterCourses() {
+        this.showCourseDropdown = true;
+        this.filteredCourses = this.coursesList.filter(course =>
+            course.toLowerCase().includes(this.searchTerm.toLowerCase())
+        );
+
+        // If user clears the input, clear the selection
+        if (!this.searchTerm) {
+            this.selectedCourse = '';
+            this.onDropdownChange('course');
+        }
+    }
+
+    selectCourse(course: string) {
+        this.selectedCourse = course;
+        this.searchTerm = course;
+        this.showCourseDropdown = false;
+        this.onDropdownChange('course');
+    }
+
+    toggleCourseDropdown() {
+        this.showCourseDropdown = !this.showCourseDropdown;
+        if (this.showCourseDropdown) {
+            this.filteredCourses = [...this.coursesList];
+        }
+    }
+
+    hideCourseDropdown() {
+        // Small delay to allow click event to register on dropdown items
+        setTimeout(() => {
+            this.showCourseDropdown = false;
+            // If nothing selected, revert searchTerm or clear it
+            if (!this.selectedCourse) {
+                this.searchTerm = '';
+            } else {
+                this.searchTerm = this.selectedCourse;
+            }
+            this.cdr.detectChanges();
+        }, 200);
     }
 
     navigateToSearch() {
